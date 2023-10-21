@@ -1,11 +1,11 @@
+use std::cmp::max;
+use std::cmp::min;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::ops::Range;
 use std::path::Path;
-use std::cmp::min;
-use std::cmp::max;
 
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
@@ -31,32 +31,31 @@ fn get_lines(filename: &str) -> Vec<String> {
     result
 }
 
-fn parse_input(filename: &str) -> BTreeMap<usize,[[bool;10];10]> {
+fn parse_input(filename: &str) -> BTreeMap<usize, [[bool; 10]; 10]> {
     let mut result = BTreeMap::new();
     let lines = get_lines(filename);
     let mut itile = 0;
-    let mut Border = [[false;10];10];
     let mut irow = 0 as usize;
+    let mut pic = [[false; 10]; 10];
     for line in lines {
         if line.contains("Tile") {
             let line = &line[5..9];
             //println!("{line}");
             itile = line.parse::<usize>().unwrap();
-            Border = [[false;10];10];
             irow = 0;
+            pic = [[false; 10]; 10];
         } else if line != "" {
             for i in 0..10 as usize {
                 if let Some(c) = line.chars().nth(i) {
                     if c == '#' {
-                        Border[irow][i] = true;
+                        pic[irow][i] = true;
                     }
                 } else {
                     println!("error {line}");
                 }
-                
             }
             if irow == 9 {
-                result.insert(itile,Border.clone());
+                result.insert(itile, pic.clone());
             }
             irow += 1;
         }
@@ -64,240 +63,311 @@ fn parse_input(filename: &str) -> BTreeMap<usize,[[bool;10];10]> {
     result
 }
 
-
-
-struct Border {
-    u: String,
-    d: String,
-    l: String,
-    r: String,
-}
-
-fn to_bin (b: bool) -> char {
-    if b {
-        '1'
-    } else {
-        '0'
-    }
-}
-
-fn get_borders(pic: &[[bool;10];10]) -> [String;4] {
-    let mut u = "".to_string();
-    let mut d = "".to_string();
-    let mut l = "".to_string();
-    let mut r = "".to_string();
-
-    for i in 0..10 {
-        u.push(to_bin(pic[0][i]));
-        d.push(to_bin(pic[9][i]));
-        l.push(to_bin(pic[i][0]));
-        r.push(to_bin(pic[i][9]));
-    }
-
-    [u,d,l,r].clone()
-}
-
-fn apply(bigpic: &mut Vec<Vec<bool>>, smallpic: &[[bool;10];10], ii: usize,jj: usize) {
-    for i in 0..8 {
-        for j in 0..8 {
-            let i1 = i + 1;
-            let j1 = j + 1;
-            let i2 = ii * 8 + i;
-            let j2 = jj * 8 + j;
-            *bigpic.get_mut(i2).unwrap().get_mut(j2).unwrap() = smallpic[i1][j1];
+fn pic_string<const N: usize, const M: usize>(pic: &[[bool; M]; N]) -> String {
+    let mut s = String::new();
+    for i in 0..N {
+        for j in 0..M {
+            s.push(if pic[i][j] { '#' } else { '.' })
         }
+        s.push('\n');
     }
+    s
 }
 
-fn print_index_map(map: &BTreeMap<(usize,usize),usize>, n: usize) {
-    for i in 0..n {
-        for j in 0..n {
-            if let Some(index) = map.get(&(i,j)) {
-                print!("{:}   ",index);
-            } else {
-                print!("----   ");
+const TRANS: [(bool, u8); 8] = [
+    (false, 0),
+    (false, 1),
+    (false, 2),
+    (false, 3),
+    (true, 0),
+    (true, 1),
+    (true, 2),
+    (true, 3),
+];
+
+fn get_monster() -> Vec<(usize,usize)> {
+    let mut op = vec![];
+    let sdragon: [&str; 3] = [
+        "                  # ",
+        "#    ##    ##    ###",
+        " #  #  #  #  #  #   ",
+    ];
+    for i in 0..3 {
+        for j in 0..20 {
+            if sdragon[i].chars().nth(j).unwrap() == '#' {
+                op.push((i,j));
             }
-        }
-        println!("");
-    }    
-}
-
-fn rev(s: &String) -> String {
-    s.clone().chars().rev().collect::<String>()
-}
-
-fn is_neighbour(b1: &[String; 4], b2: &[String; 4]) -> bool {
-    for i in b1 {
-        for j in b2 {
-            if *i == *j || *i == rev(j) {
-                return true;
-            }
-        }
-    }
-    false
-}
-
-fn is_on_edge(i: usize, n: usize) -> bool {
-    i == 0 || i == n-1
-}
-
-fn strip_borders(ip: &[[bool;10];10]) -> [[bool;8];8] {
-    let mut op = [[false;8];8];
-    for i in 0..8 {
-        for j in 0..8 {
-            op[i][j] = ip[i+1][j+1];
         }
     }
     op
 }
 
-//fn flipy(ip: &[[bool])) 
+fn top(pic: &[[bool; 10]; 10]) -> [bool; 10] {
+    pic[0].clone()
+}
 
-fn orient_top_left(ip: &[[bool;10];10], map: &BTreeMap<String,usize>) -> [[bool;10];10] {
-    let op = ip.clone();
-    let [u,d,l,r] = get_borders(&ip);
-    if map[d] == 1 {
+fn bttm(pic: &[[bool; 10]; 10]) -> [bool; 10] {
+    pic[9].clone()
+}
 
+fn left(pic: &[[bool; 10]; 10]) -> [bool; 10] {
+    let mut result = [false; 10];
+    for i in 0..10 {
+        result[i] = pic[i][0];
+    }
+    result
+}
+
+fn right(pic: &[[bool; 10]; 10]) -> [bool; 10] {
+    let mut result = [false; 10];
+    for i in 0..10 {
+        result[i] = pic[i][9];
+    }
+    result
+}
+
+fn rot90<const N: usize>(ip: &[[bool; N]; N]) -> [[bool; N]; N] {
+    let mut op = [[false; N]; N];
+    for i in 0..N {
+        for j in 0..N {
+            op[i][j] = ip[N - 1 - j][i];
+        }
+    }
+    op
+}
+
+fn flip<const N: usize>(ip: &[[bool; N]; N]) -> [[bool; N]; N] {
+    let mut op = [[false; N]; N];
+    for i in 0..N {
+        for j in 0..N {
+            op[i][N - 1 - j] = ip[i][j];
+        }
+    }
+    op
+}
+
+fn orient<const N: usize>(ip: &[[bool; N]; N], is_flip: bool, nrot: u8) -> [[bool; N]; N] {
+    let mut op = if is_flip { flip(ip) } else { ip.clone() };
+    for _i in 0..nrot {
+        op = rot90(&op);
+    }
+    op
+}
+
+fn all_edges(pic: &[[bool; 10]; 10]) -> [[bool; 10]; 4] {
+    [top(pic), bttm(pic), left(pic), right(pic)]
+}
+
+fn add_to_edge_counter(counter: &mut BTreeMap<[bool; 10], u32>, pic: &[[bool; 10]; 10]) {
+    for e1 in all_edges(pic) {
+        let mut e2 = e1.clone();
+        e2.reverse();
+        for e in [&e1, &e2] {
+            counter.entry(*e).and_modify(|v| *v += 1).or_insert(1);
+        }
     }
 }
 
-fn orient(pic1: &[[bool;10];10], pic2: &[[bool;10];10]) -> [[bool;8];8] {
-    strip_borders(pic1)
+fn get_edge_count(pics: &BTreeMap<usize, [[bool; 10]; 10]>) -> BTreeMap<[bool; 10], u32> {
+    let mut counter = BTreeMap::new();
+    for pic in pics.values() {
+        add_to_edge_counter(&mut counter, pic);
+    }
+    counter
 }
 
-fn part12(filename: &str) {
-    let ip = parse_input(filename);
-    //println!("{:?}",ip);
-    println!("{:}",ip.len());
-    let n = (ip.len() as f64).sqrt() as usize;
-    println!("n = {n}");
-    //let borders = vec![];
-    let mut map = BTreeMap::new();
-    for (i,pic) in &ip {
-        let borders = get_borders(&pic);
-        for b in &borders {
-            let b = b.clone();
-            let brev = rev(&b);
-            if b != brev {
-                map.entry(brev.clone()).and_modify(|v| *v += 1).or_insert(1);
-            }
-            map.entry(b.clone()).and_modify(|v| *v += 1).or_insert(1);
+fn is_corner(counter: &BTreeMap<[bool; 10], u32>, pic: &[[bool; 10]; 10]) -> bool {
+    let mut n_outer = 0;
+    for e in all_edges(pic) {
+        //println!("edge {:?}?",e);
+        if *counter.get(&e).unwrap() == 1 {
+            n_outer += 1;
         }
     }
-    
-    //for (s,i) in &map { println!("{s} {i}"); }
+    n_outer == 2
+}
 
-    let mut prod = 1 as u64;
-    let mut icorner = 0 as usize;
-    let mut borders_map = BTreeMap::new();
-    let iset = ip.keys().copied().collect::<BTreeSet<_>>();
-    let mut cornerset = BTreeSet::new();
-    let mut edgeset = BTreeSet::new();
-    let mut bodyset = BTreeSet::new();
-    for (i,pic) in &ip {
-        let borders = get_borders(&pic);
-        borders_map.insert(*i,borders.clone());
-        let mut count = 0;
-        for b in &borders {
-            if *map.get(b).unwrap() == 1 {
-                count += 1;
-            }
-        }
-        if count == 2 {
-            //could be a corner???
-            println!("{:} {:?}",i,borders);
-            prod *= *i as u64;
-            icorner = *i;
-            cornerset.insert(*i);
-        } else if count == 1 {
-            edgeset.insert(*i);
-        } else {
-            bodyset.insert(*i);
+fn get_corner_ids(pics: &BTreeMap<usize, [[bool; 10]; 10]>) -> Vec<usize> {
+    let mut ids = vec![];
+    let edge_counter = get_edge_count(pics);
+    for (id, pic) in pics {
+        if is_corner(&edge_counter, pic) {
+            ids.push(*id);
         }
     }
-    println!("aoc 2020 day 20 part 1 file {filename} ansswer = {prod}");
+    ids
+}
 
-    let mut bigpic = vec![vec![false;n*8];n*8];
-    let mut index_map = BTreeMap::new();
-    let mut checklist = iset.clone();
-    for i in 0..n {
-        for j in 0..n {
-            if i == 0 && j == 0 {
-                index_map.insert((i,j),icorner);
-                apply(&mut bigpic, &ip[&icorner], i, j);
-                checklist.remove(&icorner);
-                cornerset.remove(&icorner);
-                //borders_map.remove(&icorner);
-            } else {
-                let mut neighbours: Vec<usize> = Vec::new();
-                if i != 0 {
-                    neighbours.push(*index_map.get(&(i-1,j)).unwrap());
+fn usqrt(isq: usize) -> usize {
+    let mut i = 1;
+    while i * i != isq {
+        i += 1;
+    }
+    i
+}
+
+fn add_piece(
+    layout: &mut BTreeMap<(usize, usize), [[bool; 10]; 10]>,
+    pics: &mut BTreeMap<usize, [[bool; 10]; 10]>,
+    i: usize,
+    j: usize,
+) {
+    let mut idij = 0;
+    let mut picij = [[false; 10]; 10];
+    let mut found = false;
+    if (i, j) == (0, 0) {
+        let edge_counter = get_edge_count(pics);
+        let mut pic_0 = [[false; 10]; 10];
+        for (id, pic) in pics.iter() {
+            if is_corner(&edge_counter, pic) {
+                idij = *id;
+                pic_0 = pic.clone();
+                break;
+            }
+        }
+        for (f, r) in TRANS {
+            let pic = orient(&pic_0, f, r);
+            if *edge_counter.get(&top(&pic)).unwrap() == 1
+                && *edge_counter.get(&left(&pic)).unwrap() == 1
+            {
+                picij = pic.clone();
+                break;
+            }
+        }
+    } else if i == 0 {
+        let nbr = right(&layout.get(&(i, j - 1)).unwrap());
+        for (id, pic) in pics.iter() {
+            for (f, r) in TRANS {
+                let pic = orient(pic, f, r);
+                if left(&pic) == nbr {
+                    idij = *id;
+                    picij = pic.clone();
+                    found = true;
+                    break;
                 }
-                if j != 0 {
-                    neighbours.push(*index_map.get(&(i,j-1)).unwrap());
+            }
+            if found {
+                break;
+            }
+        }
+    } else {
+        let nbr = bttm(&layout.get(&(i - 1, j)).unwrap());
+        for (id, pic) in pics.iter() {
+            for (f, r) in TRANS {
+                let pic = orient(pic, f, r);
+                if top(&pic) == nbr {
+                    idij = *id;
+                    picij = pic.clone();
+                    found = true;
+                    break;
                 }
-                //let checklist = if i == 0 || i == n-1
-                let checklist = if is_on_edge(i, n) && is_on_edge(j, n) {
-                    &mut cornerset
-                } else if is_on_edge(i, n) != is_on_edge(j, n) {
-                    &mut edgeset
-                } else {
-                    &mut bodyset
-                };
+            }
+            if found {
+                break;
+            }
+        }
+    }
+    layout.insert((i, j), picij);
+    pics.remove(&idij);
+}
 
-                let mut found = false;
-                for (index,borders) in &borders_map {
-                    if checklist.contains(&index) {
-                        let mut found_neighbours = true;
-                        for ineighbour in &neighbours {
-                            let bother = borders_map.get(&ineighbour).unwrap();
-                            if !is_neighbour(bother, borders) {
-                                found_neighbours = false;
-                                break;
-                            }
-                        }
-                        if found_neighbours  {
-                            found = true;
-                            index_map.insert((i,j),*index);
-                            checklist.remove(&index);
-                            break;
-                        }
+fn add_subsection<const N: usize>(
+    big_pic: &mut [[bool; N]; N],
+    pic: &[[bool; 10]; 10],
+    ij: (usize, usize),
+) {
+    let (i, j) = ij;
+    for ii in 0..8 {
+        for jj in 0..8 {
+            big_pic[i * 8 + ii][j * 8 + jj] = pic[ii + 1][jj + 1];
+        }
+    }
+}
 
+fn look_for_monsters<const N: usize>(pic : &[[bool;N];N]) -> Option<usize> {
+    let monster = get_monster();
+    let mut coords = BTreeSet::new();
+    let mut hic_sont_dracones = false;
+    for (f,r) in TRANS {
+        let pic = orient(pic,f,r);
+        coords.clear();
+        for i in 0..N-3 {
+            for j in 0..N-20 {
+                let mut found = true;
+                for (di,dj) in &monster {
+                    let ii = i + di;
+                    let jj = j + dj;
+                    if !pic[ii][jj] {
+                        found = false;
+                        break;
                     }
                 }
-                if !found {
-                    print_index_map(&index_map, n);
-                    panic!("ERROR - no match {i} {j}");
-                } 
-            }
-        }
-    }
-
-    print_index_map(&index_map, n);
-
-    
-
-}
-
-fn part2(filename: &str) {
-    let ip = parse_input(filename);
-    let mut count = 0;
-    for (_i,pic) in ip {
-        for i in 1..9 {
-            for j in 1..9 {
-                if pic[i][j] == true {
-                    count += 1;
+                if found {
+                    for (di,dj) in &monster {
+                        let ii = i + di;
+                        let jj = j + dj;
+                        coords.insert((ii,jj));
+                    }
+                    hic_sont_dracones = true;
                 }
             }
         }
     }
-    count -= 30;
-    println!("aoc 2020 part 2 file {filename} answer = {count}");
+    if hic_sont_dracones {
+        let mut n = 0;
+        for i in 0..N {
+            for j in 0..N {
+                if pic[i][j] {
+                    n += 1;
+                }
+            }
+        }
+        Some(n - coords.len())
+    } else {
+        None
+    }
+}
+
+fn day20<const N: usize>(filename: &str) {
+    let pics = parse_input(filename);
+    for pic in pics.values() {
+        let pstr = pic_string(pic);
+        print!("{pstr}\n");
+    }
+    let corner_ids = get_corner_ids(&pics);
+    let mut ans = 1;
+    for id in corner_ids {
+        print!("{id}, ");
+        ans *= id;
+    }
+    println!("aoc 2020 day 20 file {filename} ans = {ans}");
+    let nside = usqrt(pics.len());
+    println!("{nside}x{nside}");
+
+    let mut layout = BTreeMap::new();
+    let mut big_pic = [[false; N]; N];
+    let mut remaining = pics.clone();
+
+    for i in 0..N / 8 {
+        for j in 0..N / 8 {
+            add_piece(&mut layout, &mut remaining, i, j);
+        }
+    }
+
+    for (ij, pic) in &layout {
+        add_subsection(&mut big_pic, pic, *ij);
+    }
+
+    let pstr = pic_string(&big_pic);
+    print!("{pstr}\n");
+
+    if let Some(ans) = look_for_monsters(&big_pic) {
+        println!("aoc 2020 day 20 part 2 file {filename} ans = {ans}");
+    }
+
 }
 
 fn main() {
-    part12("test_input");
-    part12("input");
-    part2("test_input");
-    part2("input");
+    day20::<24>("test_input"); //24 = 3*8
+    day20::<96>("input"); //96 = 12*8
 }
