@@ -1,10 +1,7 @@
-use std::cmp::max;
-use std::cmp::min;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::ops::Range;
 use std::path::Path;
 
 // The output is wrapped in a Result to allow matching on errors
