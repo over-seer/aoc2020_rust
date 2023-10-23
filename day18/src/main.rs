@@ -1,11 +1,7 @@
 use std::collections::BTreeMap;
-use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::ops::Range;
 use std::path::Path;
-use std::cmp::min;
-use std::cmp::max;
 
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
@@ -99,7 +95,6 @@ fn part1(filename: &str) {
 
 
 fn eq2(line: &str) -> usize {
-    let mut line_copy = String::from(line);
     let mut tokens: Vec<String> = line.split_whitespace().map(String::from).collect();
     for i in 0..tokens.len() {
         if tokens[i] == "+" {

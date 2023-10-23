@@ -95,10 +95,10 @@ fn update(grid: &BTreeSet<(i64,i64,i64)>) -> BTreeSet<(i64,i64,i64)>
     new_grid
 }
 
-fn print_grid(grid: &BTreeSet<(i64,i64,i64)>) {
-    let mut xmin = 0;
-    let mut ymin = 0;
-    let mut zmin = 0;
+fn _print_grid(grid: &BTreeSet<(i64,i64,i64)>) {
+    let xmin = 0;
+    let ymin = 0;
+    let zmin = 0;
     let mut xmax = 0;
     let mut ymax = 0;
     let mut zmax = 0;
@@ -128,7 +128,6 @@ fn part1(filename: &str) {
     //print_grid(&grid);
     for _i in 0..6 {
         grid = update(&grid);
-        let sum = grid.len();
         //print_grid(&grid);  
     }
     let sum = grid.len();
@@ -210,7 +209,6 @@ fn part2(filename: &str) {
     //print_grid(&grid);
     for _i in 0..6 {
         grid = update2(&grid);
-        let sum = grid.len();
         //print_grid(&grid);  
     }
     let sum = grid.len();

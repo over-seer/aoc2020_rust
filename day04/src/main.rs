@@ -51,7 +51,7 @@ fn is_valid_passport_part1(pp: &BTreeMap<String,String>) -> bool {
     let req = vec!["byr","iyr","eyr","hgt","hcl","ecl","pid"];
     let mut count = 0;
     for &key in &req {
-        if let Some(val) = pp.get(key) {
+        if let Some(_val) = pp.get(key) {
             count += 1;
         }
     }

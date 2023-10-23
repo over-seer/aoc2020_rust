@@ -1,8 +1,6 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use std::cmp::min;
-use std::cmp::max;
 
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
@@ -39,7 +37,7 @@ fn parse_input(filename: &str) -> Vec<Vec<char>> {
     result
 }
 
-fn print_map(map: &Vec<Vec<char>>) {
+fn _print_map(map: &Vec<Vec<char>>) {
     for v in map {
         for c in v {
             print!("{c}");

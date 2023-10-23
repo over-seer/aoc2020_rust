@@ -85,7 +85,7 @@ fn could_be(map: &BTreeMap<String, (Range<usize>, Range<usize>)>, i: usize) -> b
 }
 
 fn part1(filename: &str) {
-    let (fields, mine, nearby) = parse_input(filename);
+    let (fields, _mine, nearby) = parse_input(filename);
     //println!("{:?}", parse_input(filename));
     let mut count = 0;
     for i in nearby.iter().flatten() {

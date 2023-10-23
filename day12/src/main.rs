@@ -63,13 +63,13 @@ impl State {
         let (action, value) = instruction;
         let (this_dir,dist) = if action == 'R' {
             let n = value / 90;
-            for i in 0..n {
+            for _i in 0..n {
                 self.dir = r(&self.dir);
             }
             (self.dir.clone(),0)
         } else if action == 'L' {
             let n = value / 90;
-            for i in 0..n {
+            for _i in 0..n {
                 self.dir = l(&self.dir);
             }
             (self.dir.clone(),0)
@@ -113,12 +113,12 @@ fn update(instruction: (char, i32), waypoint: & mut Pt, ship: & mut Pt) {
     let (action, value) = instruction;
     if action == 'R' {
         let n = value / 90;
-        for i in 0..n {
+        for _i in 0..n {
             *waypoint = r(waypoint);
         }
     } else if action == 'L' {
         let n = value / 90;
-        for i in 0..n {
+        for _i in 0..n {
             *waypoint = l(waypoint);
         }
     } else if action == 'N' {

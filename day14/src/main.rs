@@ -50,7 +50,7 @@ fn parse_input(filename: &str) -> Vec<([char;36],Vec<(u64,String)>)> {
 
 fn apply_mask(mask: &[char;36], snum: &String) -> u64 {
     //println!("{snum}");
-    let num : u64 = snum.parse().unwrap();;
+    let num : u64 = snum.parse().unwrap();
     let snum = format!("{num:b}");
     let mut num = ['0';36];
     let mut v = vec![];

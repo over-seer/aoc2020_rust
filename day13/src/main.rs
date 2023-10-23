@@ -79,25 +79,11 @@ fn gcd(mut n: u64, mut m: u64) -> u64 {
     n
 }
 
-fn my_lcm(vals: &[u64]) -> u64 {
-    let mut ilcm = 1;
-    for i in vals {
-        ilcm = ilcm * i / gcd(ilcm,*i);
-    }
-    ilcm
-}
 
 fn lcm(a: u64, b: u64) -> u64 {
     a * b / gcd(a,b)
 }
 
-fn prod(vals: &[u64]) -> u64 {
-    let mut p = 1;
-    for i in vals {
-        p *= i;
-    }
-    p
-}
 
 fn next_match(mut current : u64, mut offset: u64, step: u64, v2: u64) -> (u64,u64) {
     loop {
@@ -114,7 +100,6 @@ fn next_match(mut current : u64, mut offset: u64, step: u64, v2: u64) -> (u64,u6
 fn part2(filename: &str) -> u64 {
     let (_t,snos) = parse_input(filename);
     let mut nos = vec![];
-    let mut offset = 0;
     for s in snos {
         nos.push({
             if s == "x" { 0 as u64 }
