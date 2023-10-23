@@ -1,5 +1,4 @@
 use std::collections::BTreeMap;
-use std::collections::BTreeSet;
 
 fn parse(ip: &str, ncups: usize) -> (usize, BTreeMap<usize, usize>) {
     let mut cups = BTreeMap::new();
@@ -28,15 +27,11 @@ fn parse(ip: &str, ncups: usize) -> (usize, BTreeMap<usize, usize>) {
 
 fn move_cups(cups: &mut BTreeMap<usize, usize>, start: usize, nmoves: usize) {
     let mut current = start;
-    for i in 0..nmoves {
-        let r1 = cups.get(&current).unwrap();
-        let i1 = *r1;
-        let r2 = cups.get(&i1).unwrap();
-        let i2 = *r2;
-        let r3 = cups.get(&i2).unwrap();
-        let i3 = *r3;
-        let r4 = cups.get(&i3).unwrap();
-        let i4 = *r4;
+    for _i in 0..nmoves {
+        let i1 = *cups.get(&current).unwrap();
+        let i2 = *cups.get(&i1).unwrap();
+        let i3 = *cups.get(&i2).unwrap();
+        let i4 = *cups.get(&i3).unwrap();
         let mut dest = if current == 1 {
             cups.len()
         } else {
@@ -69,7 +64,7 @@ fn part1(ip: &str) {
     move_cups(&mut cups, ifirst, 100);
     println!("{ifirst} {:?}", cups);
     let mut icup = 1;
-    for i in 0..8 {
+    for _i in 0..8 {
         icup = *cups.get(&icup).unwrap();
         print!("{icup}");
     }
@@ -81,7 +76,7 @@ fn part2(ip: &str) {
     move_cups(&mut cups, ifirst, 10000000);
     let mut icup = 1;
     let mut ans = 1;
-    for i in 0..2 {
+    for _i in 0..2 {
         icup = *cups.get(&icup).unwrap();
         print!("{icup},");
         ans *= icup;
