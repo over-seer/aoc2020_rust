@@ -5,7 +5,9 @@ use std::path::Path;
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
+where
+    P: AsRef<Path>,
+{
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
@@ -26,7 +28,7 @@ fn get_lines(filename: &str) -> Vec<usize> {
 
 fn is_sum(val: usize, nos: &[usize]) -> bool {
     for i in 0..nos.len() {
-        for j in i + 1 .. nos.len() {
+        for j in i + 1..nos.len() {
             if nos[i] + nos[j] == val {
                 return true;
             }
@@ -37,11 +39,11 @@ fn is_sum(val: usize, nos: &[usize]) -> bool {
 
 fn part1(filename: &str, n: usize) -> usize {
     let ip = get_lines(filename);
-    for i in n .. ip.len() {
+    for i in n..ip.len() {
         let val = ip[i];
-        let preceding = &ip[i-n..i];
+        let preceding = &ip[i - n..i];
         //println!("{:?}",preceding);
-        if !is_sum(val,preceding) {
+        if !is_sum(val, preceding) {
             println!("aoc 2020 day 9 part 1 for file {filename}, answer = {val}");
             return val;
         }
@@ -79,9 +81,9 @@ fn part2(filename: &str, target: usize) -> usize {
 }
 
 fn main() {
-    let test_target = part1("test_input",5);
-    let target = part1("input",25);
+    let test_target = part1("test_input", 5);
+    let target = part1("input", 25);
 
-    part2("test_input",test_target);
-    part2("input",target);
+    part2("test_input", test_target);
+    part2("input", target);
 }

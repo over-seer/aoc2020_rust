@@ -46,40 +46,38 @@ fn eq(line: &str) -> usize {
 fn brackeq(line: &str, rule: i8) -> usize {
     let mut line_copy = String::from(line);
     let mut map = BTreeMap::new();
-    for (i,s) in line.match_indices("(") {
+    for (i, s) in line.match_indices("(") {
         //println!("{i} {s}");
-        map.insert(i,s.chars().nth(0).unwrap());
+        map.insert(i, s.chars().nth(0).unwrap());
     }
-    for (i,s) in line.match_indices(")") {
+    for (i, s) in line.match_indices(")") {
         //println!("{i} {s}");
-        map.insert(i,s.chars().nth(0).unwrap());
+        map.insert(i, s.chars().nth(0).unwrap());
     }
-    
+
     let mut level = 0;
     let mut i0 = 0 as usize;
-    for (i,c) in &map {
+    for (i, c) in &map {
         if *c == '(' {
             level += 1;
             if level == 1 {
                 i0 = *i;
             }
-        }
-        else if *c == ')' {
+        } else if *c == ')' {
             if level == 1 {
                 // do something
                 let inside = &line[i0 + 1..*i];
                 let pattern = &line[i0..*i + 1];
                 //println!("inside {inside} outside {pattern}");
-                let val = brackeq(inside,rule);
-                line_copy = line_copy.replacen(pattern,&val.to_string(),1);
+                let val = brackeq(inside, rule);
+                line_copy = line_copy.replacen(pattern, &val.to_string(), 1);
             }
             level -= 1;
         }
     }
     if rule == 1 {
         eq(&line_copy)
-    }
-    else {
+    } else {
         eq2(&line_copy)
     }
 }
@@ -88,11 +86,10 @@ fn part1(filename: &str) {
     let ip = get_lines(filename);
     let mut ans = 0;
     for line in &ip {
-        ans += brackeq(line,1);
+        ans += brackeq(line, 1);
     }
     println!("aoc 2020 day 18 part 1 answer = {ans}");
 }
-
 
 fn eq2(line: &str) -> usize {
     let mut tokens: Vec<String> = line.split_whitespace().map(String::from).collect();
@@ -114,33 +111,42 @@ fn part2(filename: &str) {
     let ip = get_lines(filename);
     let mut ans = 0;
     for line in &ip {
-        ans += brackeq(line,2);
+        ans += brackeq(line, 2);
     }
     println!("aoc 2020 day 18 part 2 answer = {ans}");
 }
-
-
 
 #[cfg(test)]
 mod tests {
     use crate::brackeq;
     #[test]
     fn brackeq_test() {
-        assert_eq!(brackeq("2 * 3 + (4 * 5)",1),26);
-        assert_eq!(brackeq("5 + (8 * 3 + 9 + 3 * 4 * 3)",1),437);
-        assert_eq!(brackeq("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))",1),12240);
-        assert_eq!(brackeq("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2",1),13632);
+        assert_eq!(brackeq("2 * 3 + (4 * 5)", 1), 26);
+        assert_eq!(brackeq("5 + (8 * 3 + 9 + 3 * 4 * 3)", 1), 437);
+        assert_eq!(
+            brackeq("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))", 1),
+            12240
+        );
+        assert_eq!(
+            brackeq("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2", 1),
+            13632
+        );
     }
-    
+
     #[test]
     fn brackeq2_test() {
-        assert_eq!(brackeq("2 * 3 + (4 * 5)",2),46);
-        assert_eq!(brackeq("5 + (8 * 3 + 9 + 3 * 4 * 3)",2),1445);
-        assert_eq!(brackeq("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))",2),669060);
-        assert_eq!(brackeq("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2",2),23340);
+        assert_eq!(brackeq("2 * 3 + (4 * 5)", 2), 46);
+        assert_eq!(brackeq("5 + (8 * 3 + 9 + 3 * 4 * 3)", 2), 1445);
+        assert_eq!(
+            brackeq("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))", 2),
+            669060
+        );
+        assert_eq!(
+            brackeq("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2", 2),
+            23340
+        );
     }
 }
-
 
 fn main() {
     part1("input");

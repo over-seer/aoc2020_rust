@@ -82,7 +82,7 @@ const TRANS: [(bool, u8); 8] = [
     (true, 3),
 ];
 
-fn get_monster() -> Vec<(usize,usize)> {
+fn get_monster() -> Vec<(usize, usize)> {
     let mut op = vec![];
     let sdragon: [&str; 3] = [
         "                  # ",
@@ -92,7 +92,7 @@ fn get_monster() -> Vec<(usize,usize)> {
     for i in 0..3 {
         for j in 0..20 {
             if sdragon[i].chars().nth(j).unwrap() == '#' {
-                op.push((i,j));
+                op.push((i, j));
             }
         }
     }
@@ -281,17 +281,17 @@ fn add_subsection<const N: usize>(
     }
 }
 
-fn look_for_monsters<const N: usize>(pic : &[[bool;N];N]) -> Option<usize> {
+fn look_for_monsters<const N: usize>(pic: &[[bool; N]; N]) -> Option<usize> {
     let monster = get_monster();
     let mut coords = BTreeSet::new();
     let mut hic_sont_dracones = false;
-    for (f,r) in TRANS {
-        let pic = orient(pic,f,r);
+    for (f, r) in TRANS {
+        let pic = orient(pic, f, r);
         coords.clear();
-        for i in 0..N-3 {
-            for j in 0..N-20 {
+        for i in 0..N - 3 {
+            for j in 0..N - 20 {
                 let mut found = true;
-                for (di,dj) in &monster {
+                for (di, dj) in &monster {
                     let ii = i + di;
                     let jj = j + dj;
                     if !pic[ii][jj] {
@@ -300,10 +300,10 @@ fn look_for_monsters<const N: usize>(pic : &[[bool;N];N]) -> Option<usize> {
                     }
                 }
                 if found {
-                    for (di,dj) in &monster {
+                    for (di, dj) in &monster {
                         let ii = i + di;
                         let jj = j + dj;
-                        coords.insert((ii,jj));
+                        coords.insert((ii, jj));
                     }
                     hic_sont_dracones = true;
                 }
@@ -361,7 +361,6 @@ fn day20<const N: usize>(filename: &str) {
     if let Some(ans) = look_for_monsters(&big_pic) {
         println!("aoc 2020 day 20 part 2 file {filename} ans = {ans}");
     }
-
 }
 
 fn main() {

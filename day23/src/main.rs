@@ -50,8 +50,8 @@ fn move_cups(cups: &mut BTreeMap<usize, usize>, start: usize, nmoves: usize) {
         }
         let rdestr = cups.get(&dest).unwrap();
         let idestr = *rdestr;
-        let moves = [(dest,i1),(i3,idestr),(current,i4)];
-        for (k,v) in moves {
+        let moves = [(dest, i1), (i3, idestr), (current, i4)];
+        for (k, v) in moves {
             *cups.get_mut(&k).unwrap() = v;
         }
         current = i4;
@@ -68,7 +68,7 @@ fn part1(ip: &str) {
         icup = *cups.get(&icup).unwrap();
         print!("{icup}");
     }
-    println!(" <- answer to part1 for {}",ip);
+    println!(" <- answer to part1 for {}", ip);
 }
 
 fn part2(ip: &str) {
@@ -81,7 +81,7 @@ fn part2(ip: &str) {
         print!("{icup},");
         ans *= icup;
     }
-    println!(" ... answer to part2 for {} is {}",ip,ans);
+    println!(" ... answer to part2 for {} is {}", ip, ans);
 }
 
 fn main() {

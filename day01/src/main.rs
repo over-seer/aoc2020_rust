@@ -1,12 +1,14 @@
+use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use std::collections::BTreeSet;
 
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
+where
+    P: AsRef<Path>,
+{
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
@@ -50,13 +52,13 @@ fn get_match(set: &BTreeSet<i64>, sum: i64) -> Option<i64> {
     None
 }
 
-fn get_match3(set: &BTreeSet<i64>, sum: i64) -> Option<(i64,i64,i64)> {
+fn get_match3(set: &BTreeSet<i64>, sum: i64) -> Option<(i64, i64, i64)> {
     for &i in set {
         for &j in set {
             let k = sum - i - j;
             if k > 0 && k != i && k != j && i != j {
                 if set.contains(&k) {
-                    return Some((i,j,k));
+                    return Some((i, j, k));
                 }
             }
         }
@@ -64,30 +66,28 @@ fn get_match3(set: &BTreeSet<i64>, sum: i64) -> Option<(i64,i64,i64)> {
     None
 }
 
-
 fn do_stuff(filename: &str) -> Option<i64> {
     println!("get match for file: {filename}");
     let ip = parse_ip(filename);
-    if let Some(i) = get_match(&ip,2020) {
+    if let Some(i) = get_match(&ip, 2020) {
         let j = 2020 - i;
-        let product = i*j;
+        let product = i * j;
         println!("Answer for {filename} = {i}x{j}={product}");
         return Some(product);
-    } 
+    }
     None
 }
 
 fn do_stuff_part2(filename: &str) -> Option<i64> {
     println!("part 2 get match for file: {filename}");
     let ip = parse_ip(filename);
-    if let Some((i,j,k)) = get_match3(&ip, 2020) {
+    if let Some((i, j, k)) = get_match3(&ip, 2020) {
         let product = i * j * k;
         println!("Answer for {filename} = {i}x{j}x{k}={product}");
         return Some(product);
     }
     None
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -100,7 +100,6 @@ mod tests {
         assert_eq!(result.unwrap(), 514579);
     }
 
-
     #[test]
     fn it_works2() {
         let result = do_stuff_part2("test_input");
@@ -109,7 +108,7 @@ mod tests {
     }
 }
 
-fn main () {
+fn main() {
     println!("aoc 2020 day 1");
     do_stuff("input");
     do_stuff_part2("input");

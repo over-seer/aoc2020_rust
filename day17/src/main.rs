@@ -1,8 +1,8 @@
+use std::cmp::max;
 use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use std::cmp::max;
 
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
@@ -28,7 +28,7 @@ fn get_lines(filename: &str) -> Vec<String> {
     result
 }
 
-fn parse_input(filename: &str) -> BTreeSet<(i64,i64,i64)> {
+fn parse_input(filename: &str) -> BTreeSet<(i64, i64, i64)> {
     let mut result = BTreeSet::new();
     let lines = get_lines(filename);
     let z = 0 as i64;
@@ -37,7 +37,7 @@ fn parse_input(filename: &str) -> BTreeSet<(i64,i64,i64)> {
         let mut x = 0 as i64;
         for c in line.chars() {
             if c == '#' {
-                result.insert((x,y,z));
+                result.insert((x, y, z));
             }
             x += 1;
         }
@@ -46,13 +46,13 @@ fn parse_input(filename: &str) -> BTreeSet<(i64,i64,i64)> {
     result
 }
 
-fn neighbours(pt: &(i64,i64,i64)) -> BTreeSet<(i64,i64,i64)> {
+fn neighbours(pt: &(i64, i64, i64)) -> BTreeSet<(i64, i64, i64)> {
     let mut s = BTreeSet::new();
-    let (x,y,z) = pt;
-    for i in x-1..x+2 {
-        for j in y-1..y+2 {
-            for k in z-1..z+2 {
-                s.insert((i,j,k));
+    let (x, y, z) = pt;
+    for i in x - 1..x + 2 {
+        for j in y - 1..y + 2 {
+            for k in z - 1..z + 2 {
+                s.insert((i, j, k));
             }
         }
     }
@@ -60,9 +60,8 @@ fn neighbours(pt: &(i64,i64,i64)) -> BTreeSet<(i64,i64,i64)> {
     s
 }
 
-fn update(grid: &BTreeSet<(i64,i64,i64)>) -> BTreeSet<(i64,i64,i64)>
-{
-    let mut new_grid: BTreeSet<(i64,i64,i64)> = BTreeSet::new();
+fn update(grid: &BTreeSet<(i64, i64, i64)>) -> BTreeSet<(i64, i64, i64)> {
+    let mut new_grid: BTreeSet<(i64, i64, i64)> = BTreeSet::new();
 
     for pt1 in grid {
         let mut sum = 0;
@@ -83,16 +82,16 @@ fn update(grid: &BTreeSet<(i64,i64,i64)>) -> BTreeSet<(i64,i64,i64)>
                     new_grid.insert(pt2.clone());
                 }
             }
-        } 
+        }
         //println!("pt {:?} has {:} neighbours",pt1,sum);
-        if sum == 2 || sum ==3 {
+        if sum == 2 || sum == 3 {
             new_grid.insert(pt1.clone());
         }
     }
     new_grid
 }
 
-fn _print_grid(grid: &BTreeSet<(i64,i64,i64)>) {
+fn _print_grid(grid: &BTreeSet<(i64, i64, i64)>) {
     let xmin = 0;
     let ymin = 0;
     let zmin = 0;
@@ -100,16 +99,16 @@ fn _print_grid(grid: &BTreeSet<(i64,i64,i64)>) {
     let mut ymax = 0;
     let mut zmax = 0;
 
-    for (x,y,z) in grid {
-        xmax = max(xmax,*x);
-        ymax = max(ymax,*y);
-        zmax = max(zmax,*z);
+    for (x, y, z) in grid {
+        xmax = max(xmax, *x);
+        ymax = max(ymax, *y);
+        zmax = max(zmax, *z);
     }
 
-    for z in zmin..zmax+1 {
-        for y in ymin..ymax+1 {
-            for x in xmin..xmax+1 {
-                let c = if grid.contains(&(x,y,z)) { '#' } else { '.' };
+    for z in zmin..zmax + 1 {
+        for y in ymin..ymax + 1 {
+            for x in xmin..xmax + 1 {
+                let c = if grid.contains(&(x, y, z)) { '#' } else { '.' };
                 print!("{c}");
             }
             println!();
@@ -125,14 +124,13 @@ fn part1(filename: &str) {
     //print_grid(&grid);
     for _i in 0..6 {
         grid = update(&grid);
-        //print_grid(&grid);  
+        //print_grid(&grid);
     }
     let sum = grid.len();
-    println!("aoc 2020 day 17 part 1 file {filename}, answer = {sum}")    
+    println!("aoc 2020 day 17 part 1 file {filename}, answer = {sum}")
 }
 
-
-fn parse_input2(filename: &str) -> BTreeSet<(i64,i64,i64,i64)> {
+fn parse_input2(filename: &str) -> BTreeSet<(i64, i64, i64, i64)> {
     let mut result = BTreeSet::new();
     let lines = get_lines(filename);
     let z = 0 as i64;
@@ -141,7 +139,7 @@ fn parse_input2(filename: &str) -> BTreeSet<(i64,i64,i64,i64)> {
         let mut x = 0 as i64;
         for c in line.chars() {
             if c == '#' {
-                result.insert((x,y,z,z));
+                result.insert((x, y, z, z));
             }
             x += 1;
         }
@@ -150,14 +148,14 @@ fn parse_input2(filename: &str) -> BTreeSet<(i64,i64,i64,i64)> {
     result
 }
 
-fn neighbours2(pt: &(i64,i64,i64,i64)) -> BTreeSet<(i64,i64,i64,i64)> {
+fn neighbours2(pt: &(i64, i64, i64, i64)) -> BTreeSet<(i64, i64, i64, i64)> {
     let mut s = BTreeSet::new();
-    let (x,y,z,w) = pt;
-    for i in x-1..x+2 {
-        for j in y-1..y+2 {
-            for k in z-1..z+2 {
-                for l in w-1..w+2 {
-                    s.insert((i,j,k,l));
+    let (x, y, z, w) = pt;
+    for i in x - 1..x + 2 {
+        for j in y - 1..y + 2 {
+            for k in z - 1..z + 2 {
+                for l in w - 1..w + 2 {
+                    s.insert((i, j, k, l));
                 }
             }
         }
@@ -166,9 +164,8 @@ fn neighbours2(pt: &(i64,i64,i64,i64)) -> BTreeSet<(i64,i64,i64,i64)> {
     s
 }
 
-fn update2(grid: &BTreeSet<(i64,i64,i64,i64)>) -> BTreeSet<(i64,i64,i64,i64)>
-{
-    let mut new_grid: BTreeSet<(i64,i64,i64,i64)> = BTreeSet::new();
+fn update2(grid: &BTreeSet<(i64, i64, i64, i64)>) -> BTreeSet<(i64, i64, i64, i64)> {
+    let mut new_grid: BTreeSet<(i64, i64, i64, i64)> = BTreeSet::new();
 
     for pt1 in grid {
         let mut sum = 0;
@@ -189,15 +186,14 @@ fn update2(grid: &BTreeSet<(i64,i64,i64,i64)>) -> BTreeSet<(i64,i64,i64,i64)>
                     new_grid.insert(pt2.clone());
                 }
             }
-        } 
+        }
         //println!("pt {:?} has {:} neighbours",pt1,sum);
-        if sum == 2 || sum ==3 {
+        if sum == 2 || sum == 3 {
             new_grid.insert(pt1.clone());
         }
     }
     new_grid
 }
-
 
 fn part2(filename: &str) {
     let ip = parse_input2(filename);
@@ -206,12 +202,11 @@ fn part2(filename: &str) {
     //print_grid(&grid);
     for _i in 0..6 {
         grid = update2(&grid);
-        //print_grid(&grid);  
+        //print_grid(&grid);
     }
     let sum = grid.len();
-    println!("aoc 2020 day 17 part 2 file {filename}, answer = {sum}")    
+    println!("aoc 2020 day 17 part 2 file {filename}, answer = {sum}")
 }
-
 
 fn main() {
     part1("test_input");

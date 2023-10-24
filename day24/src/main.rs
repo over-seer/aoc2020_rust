@@ -113,11 +113,7 @@ fn still_black(blacks: &BTreeSet<[i32; 2]>, ij0: &[i32; 2]) -> bool {
     !(count == 0 || count > 2)
 }
 
-fn becomes_black(
-    blacks: &BTreeSet<[i32; 2]>,
-    known: &[i32; 2],
-    ij0: &[i32; 2],
-) -> bool {
+fn becomes_black(blacks: &BTreeSet<[i32; 2]>, known: &[i32; 2], ij0: &[i32; 2]) -> bool {
     let mut count = 1;
     for ij in neighbours(ij0) {
         if ij != *known {
@@ -132,7 +128,6 @@ fn becomes_black(
     count == 2
 }
 
-
 fn process(old_blacks: &BTreeSet<[i32; 2]>) -> BTreeSet<[i32; 2]> {
     let mut new_blacks = BTreeSet::new();
     for ij in old_blacks {
@@ -141,7 +136,7 @@ fn process(old_blacks: &BTreeSet<[i32; 2]>) -> BTreeSet<[i32; 2]> {
         }
         for ij_prime in neighbours(ij) {
             if !old_blacks.contains(&ij_prime) {
-                if becomes_black(old_blacks,ij,&ij_prime) {
+                if becomes_black(old_blacks, ij, &ij_prime) {
                     new_blacks.insert(ij_prime);
                 }
             }

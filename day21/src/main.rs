@@ -105,7 +105,7 @@ fn solve(
     }
 
     while ingr_by_allergen.len() < na {
-    //for loop1 in 0..1 {
+        //for loop1 in 0..1 {
         //println!("{:?} {:?}", ingr_by_allergen.len(), na);
         solve_iteration(
             ip,
@@ -128,7 +128,7 @@ fn day21(filename: &str) {
     let mut ans1 = 0;
     for (i, a) in a_by_i {
         if a == "None" {
-            for (iset,_aset) in ip.iter() {
+            for (iset, _aset) in ip.iter() {
                 if iset.contains(&i) {
                     ans1 += 1;
                 }

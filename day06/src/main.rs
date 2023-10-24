@@ -1,12 +1,14 @@
+use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use std::collections::BTreeSet;
 
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
+where
+    P: AsRef<Path>,
+{
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
@@ -32,8 +34,7 @@ fn parse_input1(filename: &str) -> Vec<BTreeSet<char>> {
     for line in lines {
         if line == "".to_string() {
             result.push(BTreeSet::<char>::new());
-        }
-        else {
+        } else {
             for c in line.chars() {
                 result.last_mut().unwrap().insert(c);
             }
@@ -59,8 +60,7 @@ fn parse_input2(filename: &str) -> Vec<Vec<BTreeSet<char>>> {
     for line in lines {
         if line == "".to_string() {
             result.push(vec![]);
-        }
-        else {
+        } else {
             let mut v = BTreeSet::new();
             for c in line.chars() {
                 v.insert(c);
@@ -82,12 +82,11 @@ fn both(set1: &BTreeSet<char>, set2: &BTreeSet<char>) -> BTreeSet<char> {
 fn inall(sets: &Vec<BTreeSet<char>>) -> BTreeSet<char> {
     let mut result = if let Some(set) = sets.first() {
         set.clone()
-    }
-    else {
+    } else {
         BTreeSet::new()
     };
     for i in 1..sets.len() {
-        result = both(&result,&sets[i]);
+        result = both(&result, &sets[i]);
     }
     result
 }

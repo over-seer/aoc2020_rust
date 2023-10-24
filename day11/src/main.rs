@@ -5,7 +5,9 @@ use std::path::Path;
 // The output is wrapped in a Result to allow matching on errors
 // Returns an Iterator to the Reader of the lines of the file.
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
+where
+    P: AsRef<Path>,
+{
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
@@ -47,13 +49,7 @@ fn _print_map(map: &Vec<Vec<char>>) {
     println!("");
 }
 
-fn count_neighbours(
-    map: &Vec<Vec<char>>,
-    nx: usize,
-    ny: usize,
-    x0: usize,
-    y0: usize
-) -> usize {
+fn count_neighbours(map: &Vec<Vec<char>>, nx: usize, ny: usize, x0: usize, y0: usize) -> usize {
     let mut n = 0;
     let xmin = if x0 == 0 { x0 } else { x0 - 1 };
     let xmax = if x0 == nx - 1 { x0 } else { x0 + 1 };
@@ -62,11 +58,15 @@ fn count_neighbours(
 
     for x in xmin..xmax + 1 {
         for y in ymin..ymax + 1 {
-            if map[y][x] == '#' { n += 1; };
+            if map[y][x] == '#' {
+                n += 1;
+            };
         }
     }
 
-    if map[y0][x0] == '#' { n -= 1; }
+    if map[y0][x0] == '#' {
+        n -= 1;
+    }
     n
 }
 
@@ -74,13 +74,7 @@ fn in_bounds(nx: i32, ny: i32, x: i32, y: i32) -> bool {
     x >= 0 && x < nx && y >= 0 && y < ny
 }
 
-fn count_in_sight(
-    map: &Vec<Vec<char>>,
-    nx: usize,
-    ny: usize,
-    x0: usize,
-    y0: usize
-) -> usize {
+fn count_in_sight(map: &Vec<Vec<char>>, nx: usize, ny: usize, x0: usize, y0: usize) -> usize {
     let mut n = 0;
     let mut x = [x0 as i32; 8];
     let mut y = [y0 as i32; 8];
@@ -108,15 +102,13 @@ fn count_in_sight(
                         n += 1;
                     }
                 }
-            }
-            else {
+            } else {
                 is_in[i] = false;
             }
         }
     }
     n
 }
-
 
 fn update(old_map: &Vec<Vec<char>>, part: usize) -> Vec<Vec<char>> {
     let mut new_map = old_map.clone();
@@ -135,8 +127,7 @@ fn update(old_map: &Vec<Vec<char>>, part: usize) -> Vec<Vec<char>> {
 
                 if nn == 0 {
                     new_map[y][x] = '#';
-                }
-                else if nn >= tolerance {
+                } else if nn >= tolerance {
                     new_map[y][x] = 'L';
                 }
             }
@@ -149,7 +140,7 @@ fn go(filename: &str, part: usize) -> usize {
     let mut old_map = parse_input(filename);
     let mut converged = false;
     while !converged {
-        let new_map = update(&old_map,part);
+        let new_map = update(&old_map, part);
         converged = new_map == old_map;
         old_map = new_map;
     }
@@ -158,7 +149,9 @@ fn go(filename: &str, part: usize) -> usize {
 
     let mut n = 0;
     for c in old_map.into_iter().flatten() {
-        if c == '#' { n += 1; }
+        if c == '#' {
+            n += 1;
+        }
     }
 
     println!("aoc 2020 day 11 part {part} for file {filename}, answer = {n}");
@@ -166,16 +159,15 @@ fn go(filename: &str, part: usize) -> usize {
 }
 
 fn main() {
-    go("test_input",1);
-    go("input",1);
-    go("test_input",2);
-    go("input",2);
+    go("test_input", 1);
+    go("input", 1);
+    go("test_input", 2);
+    go("input", 2);
 
     //let mut map1 = parse_input("test_input");
     for _i in 0..4 {
         //let map2 = update(&map1,2);
         //print_map(&map2);
-        //map1 = map2;        
+        //map1 = map2;
     }
-    
 }

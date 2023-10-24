@@ -126,7 +126,7 @@ fn set_field(
     keys: &mut BTreeSet<String>,
     fields: &mut BTreeMap<String, usize>,
     i: usize,
-    key: &String
+    key: &String,
 ) {
     fields.insert(key.clone(), i);
     keys.remove(key);
@@ -207,13 +207,12 @@ fn part2(filename: &str) {
     //println!("{:?}", fields);
 
     let mut ans = 1;
-    for (key,index) in &fields {
+    for (key, index) in &fields {
         if key.starts_with("departure") {
             ans *= mine[*index];
         }
     }
     println!("aoc 2020 day 16 part 2 file {filename} answer = {ans}")
-
 }
 
 fn main() {
